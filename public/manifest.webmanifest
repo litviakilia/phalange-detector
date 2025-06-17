@@ -1,0 +1,18 @@
+{
+  "name": "PalmKeys Web",
+  "short_name": "PalmKeys",
+  "description": "Virtual keyboard using hand tracking",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "landscape",
+  "background_color": "#242424",
+  "theme_color": "#ffffff",
+  "icons": [
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+} 
