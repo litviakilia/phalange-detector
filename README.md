@@ -50,6 +50,17 @@ Append `?demo=true` to the URL to run with prerecorded hand tracking data.
 - Runs at 30 fps max for thermal management
 - Requires HTTPS for camera access
 
+## Deployment
+
+The app is automatically deployed to GitHub Pages when changes are pushed to the main branch. The deployment process:
+
+1. Builds the app with `pnpm build`
+2. Generates the PWA icon
+3. Deploys to GitHub Pages
+4. Enables HTTPS automatically
+
+You can access the deployed version at: https://[your-username].github.io/palmkeys-web/
+
 ## TODO
 
 - [ ] Character/key mapping

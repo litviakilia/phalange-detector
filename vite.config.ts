@@ -4,7 +4,7 @@ import { VitePWA } from 'vite-plugin-pwa'
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  base: '/palmkeys-web/', // GitHub Pages base path
+  base: '/phalange-detector/', // GitHub Pages base path
   plugins: [
     react(),
     VitePWA({
@@ -16,7 +16,7 @@ export default defineConfig({
         theme_color: '#ffffff',
         icons: [
           {
-            src: '/palmkeys-web/icon-512.png',
+            src: '/phalange-detector/icon-512.png',
             sizes: '512x512',
             type: 'image/png',
             purpose: 'any maskable'
