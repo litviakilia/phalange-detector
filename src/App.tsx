@@ -5,8 +5,8 @@ import { HandTracker } from './lib/handTracker'
 import { PressDetector } from './lib/pressDetector'
 import { Overlay } from './components/Overlay'
 import { PermissionDialog } from './components/PermissionDialog'
-import { LogWindow } from './components/LogWindow'
-import { StatusBar } from './components/StatusBar'
+import { LogWindow } from './components/LogWindow.tsx'
+import { StatusBar } from './components/StatusBar.tsx'
 
 const App = () => {
   const videoRef = useRef<HTMLVideoElement>(null)
@@ -60,26 +60,19 @@ const App = () => {
     if (!handTracker || !videoRef.current) return
     let animationFrame: number
     let lastVideoTime = -1
-    let frameCount = 0
     const detect = async () => {
       const video = videoRef.current
       if (!video) return
       if (video.currentTime !== lastVideoTime) {
-        frameCount++
-        log(`Processing frame #${frameCount} (video time: ${video.currentTime.toFixed(2)}s)`) 
-        log(`Video properties: width=${video.videoWidth}, height=${video.videoHeight}, readyState=${video.readyState}`)
         try {
           const joints = await handTracker.detectHands(video)
           if (joints && joints.length > 0) {
             setJoints(joints)
-            log(`Detected ${joints.length} joints`)
             const presses = pressDetector.detectPresses(joints)
             setPresses(presses)
-            log(`Detected ${presses.length} presses`)
           } else {
             setJoints(null)
             setPresses([])
-            log('No hands detected')
           }
         } catch (err) {
           log('Error during hand detection: ' + (err instanceof Error ? err.message : JSON.stringify(err)))

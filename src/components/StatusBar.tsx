@@ -7,8 +7,8 @@ interface StatusBarProps {
 
 export const StatusBar: FC<StatusBarProps> = ({ presses }) => {
   const text = presses.length === 0
-    ? 'No phalange pressed'
-    : 'Pressed: ' + presses.map(p => `${p.hand} ${capitalize(p.finger)} ${p.segment}`).join(', ')
+    ? 'No pinch detected'
+    : 'Pinch detected'
 
   return (
     <div style={{
@@ -31,8 +31,4 @@ export const StatusBar: FC<StatusBarProps> = ({ presses }) => {
       {text}
     </div>
   )
-}
-
-function capitalize(s: string) {
-  return s.charAt(0).toUpperCase() + s.slice(1)
 } 
