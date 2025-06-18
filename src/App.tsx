@@ -25,11 +25,11 @@ const App = () => {
     const initHandLandmarker = async () => {
       log('Initializing HandLandmarker...')
       try {
-        const vision = await FilesetResolver.forVisionTasks('/cdn/npm/@mediapipe/tasks-vision@0.10.12/wasm')
+        const vision = await FilesetResolver.forVisionTasks('https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.12/wasm')
         log('FilesetResolver loaded')
         const landmarker = await HandLandmarker.createFromOptions(vision, {
           baseOptions: {
-            modelAssetPath: '/cdn/npm/@mediapipe/tasks-vision@0.10.12/wasm/hand_landmarker.task',
+            modelAssetPath: 'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.12/wasm/hand_landmarker.task',
             delegate: 'GPU'
           },
           runningMode: 'VIDEO',

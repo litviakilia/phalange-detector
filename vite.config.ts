@@ -29,15 +29,5 @@ export default defineConfig({
         globPatterns: ['**/*.{js,css,html,ico,png,svg}']
       }
     })
-  ],
-  server: {
-    https: true,
-    proxy: {
-      '/cdn': {
-        target: 'https://cdn.jsdelivr.net',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/cdn/, '')
-      }
-    }
-  }
+  ]
 }) 
