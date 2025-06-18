@@ -1,4 +1,4 @@
-import { HandLandmarker, NormalizedLandmark } from '@mediapipe/tasks-vision'
+import { HandLandmarker } from '@mediapipe/tasks-vision'
 import { Joint } from '../store/handStore'
 
 export class HandTracker {
@@ -23,7 +23,7 @@ export class HandTracker {
       return null
     }
 
-    return results.landmarks[0].map((landmark: NormalizedLandmark, index) => ({
+    return results.landmarks[0].map((landmark, index) => ({
       x: landmark.x,
       y: landmark.y,
       z: landmark.z,
