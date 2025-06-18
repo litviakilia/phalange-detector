@@ -21,18 +21,25 @@ const App = () => {
 
   useEffect(() => {
     const initHandLandmarker = async () => {
-      const vision = await FilesetResolver.forVisionTasks('/cdn/npm/@mediapipe/tasks-vision@0.10.12/wasm')
-      const landmarker = await HandLandmarker.createFromOptions(vision, {
-        baseOptions: {
-          modelAssetPath: '/cdn/npm/@mediapipe/tasks-vision@0.10.12/wasm/hand_landmarker.task',
-          delegate: 'GPU'
-        },
-        runningMode: 'VIDEO',
-        numHands: 2
-      })
-      setHandTracker(new HandTracker(landmarker))
+      log('Initializing HandLandmarker...')
+      try {
+        const vision = await FilesetResolver.forVisionTasks('/cdn/npm/@mediapipe/tasks-vision@0.10.12/wasm')
+        log('FilesetResolver loaded')
+        const landmarker = await HandLandmarker.createFromOptions(vision, {
+          baseOptions: {
+            modelAssetPath: '/cdn/npm/@mediapipe/tasks-vision@0.10.12/wasm/hand_landmarker.task',
+            delegate: 'GPU'
+          },
+          runningMode: 'VIDEO',
+          numHands: 2
+        })
+        setHandTracker(new HandTracker(landmarker))
+        log('HandLandmarker initialized successfully')
+      } catch (e) {
+        log('HandLandmarker error: ' + (e instanceof Error ? e.message : JSON.stringify(e)))
+      }
     }
-    initHandLandmarker().catch(e => log('HandLandmarker error: ' + e))
+    initHandLandmarker()
     // eslint-disable-next-line
   }, [])
 
@@ -40,21 +47,35 @@ const App = () => {
     if (!handTracker || !videoRef.current) return
     let animationFrame: number
     let lastVideoTime = -1
+    let frameCount = 0
     const detect = async () => {
       const video = videoRef.current
       if (!video) return
       if (video.currentTime !== lastVideoTime) {
+        frameCount++
+        log(`Processing frame #${frameCount} (video time: ${video.currentTime.toFixed(2)}s)`) 
         const joints = await handTracker.detectHands(video)
-        if (joints) {
+        if (joints && joints.length > 0) {
           setJoints(joints)
-          setPresses(pressDetector.detectPresses(joints))
+          log(`Detected ${joints.length} joints`)
+          const presses = pressDetector.detectPresses(joints)
+          setPresses(presses)
+          log(`Detected ${presses.length} presses`)
+        } else {
+          setJoints(null)
+          setPresses([])
+          log('No hands detected')
         }
         lastVideoTime = video.currentTime
       }
       animationFrame = requestAnimationFrame(detect)
     }
+    log('Starting hand detection loop')
     detect()
-    return () => cancelAnimationFrame(animationFrame)
+    return () => {
+      log('Stopping hand detection loop')
+      cancelAnimationFrame(animationFrame)
+    }
   }, [handTracker, pressDetector, setJoints, setPresses])
 
   const log = (msg: string) => setLogs(l => [...l, `[${new Date().toLocaleTimeString()}] ${msg}`])
