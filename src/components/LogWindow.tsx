@@ -8,7 +8,7 @@ interface LogWindowProps {
 export const LogWindow: FC<LogWindowProps> = ({ logs, onClose }) => (
   <div style={{
     position: 'fixed',
-    bottom: 20,
+    top: 20,
     right: 20,
     width: 600,
     maxHeight: 500,
