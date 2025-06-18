@@ -16,7 +16,6 @@ interface Phalanx {
 export class PressDetector {
   private readonly phalanges: Phalanx[]
   private lastPresses: Set<string>
-  private readonly hysteresis = 2 // frames
 
   constructor() {
     this.phalanges = this.initPhalanges()
