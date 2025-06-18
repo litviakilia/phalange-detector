@@ -107,17 +107,6 @@ const App = () => {
 
   return (
     <div className="camera-container">
-      <div style={{ position: 'absolute', top: 10, left: 10, zIndex: 10 }}>
-        <button onClick={toggleCamera} style={{ marginRight: 8 }}>
-          Switch Camera
-        </button>
-        <button onClick={stopCamera} style={{ marginRight: 8 }}>
-          Stop Camera
-        </button>
-        <button onClick={() => setShowLogs(l => !l)}>
-          {showLogs ? 'Hide Logs' : 'Show Logs'}
-        </button>
-      </div>
       <video
         ref={videoRef}
         autoPlay
@@ -129,6 +118,58 @@ const App = () => {
         <PermissionDialog onClose={() => setShowPermissionDialog(false)} />
       )}
       {showLogs && <LogWindow logs={logs} onClose={() => setShowLogs(false)} />}
+      <div style={{
+        position: 'fixed',
+        left: 0,
+        right: 0,
+        bottom: 0,
+        zIndex: 1001,
+        display: 'flex',
+        justifyContent: 'center',
+        gap: 16,
+        padding: '20px 0',
+        background: 'rgba(0,0,0,0.5)'
+      }}>
+        <button style={{
+          fontSize: 20,
+          padding: '18px 32px',
+          borderRadius: 12,
+          border: 'none',
+          background: '#0066ff',
+          color: '#fff',
+          fontWeight: 'bold',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
+          cursor: 'pointer',
+        }} onClick={toggleCamera}>
+          Switch Camera
+        </button>
+        <button style={{
+          fontSize: 20,
+          padding: '18px 32px',
+          borderRadius: 12,
+          border: 'none',
+          background: '#ff3333',
+          color: '#fff',
+          fontWeight: 'bold',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
+          cursor: 'pointer',
+        }} onClick={stopCamera}>
+          Stop Camera
+        </button>
+        <button style={{
+          fontSize: 20,
+          padding: '18px 32px',
+          borderRadius: 12,
+          border: 'none',
+          background: '#333',
+          color: '#fff',
+          fontWeight: 'bold',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
+          cursor: 'pointer',
+        }} onClick={() => setShowLogs(l => !l)}>
+          {showLogs ? 'Hide Logs' : 'Show Logs'}
+        </button>
+      </div>
     </div>
   )
 }
