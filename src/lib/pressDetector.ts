@@ -1,9 +1,10 @@
 import { Joint, PressEvent } from '../store/handStore'
 
 // Adjusted threshold for more sensitive detection
-const PRESS_THRESHOLD_MM = 12
+const PRESS_THRESHOLD_MM = 6 // tighter threshold to reduce false presses
 const PX_TO_MM = 0.5
 const PRESS_THRESHOLD_PX = PRESS_THRESHOLD_MM / PX_TO_MM
+const HYSTERESIS_FRAMES = 3 // consecutive frames required to confirm press/release
 
 interface Phalanx {
   hand: 'left' | 'right'
@@ -16,11 +17,13 @@ interface Phalanx {
 export class PressDetector {
   private readonly phalanges: Phalanx[]
   private lastPresses: Set<string>
+  private pressCounters: Map<string, number>
   private log?: (msg: string) => void
 
   constructor(logFn?: (msg: string) => void) {
     this.phalanges = this.initPhalanges()
     this.lastPresses = new Set()
+    this.pressCounters = new Map()
     this.log = logFn
   }
 
@@ -73,11 +76,17 @@ export class PressDetector {
       const distance = this.distance3D(thumbTip, midpoint)
       const id = `${phalanx.hand}-${phalanx.finger}-${phalanx.segment}`
       this.log?.(`Phalanx ${id}: distance=${distance.toFixed(4)} px`)
-      if (distance < PRESS_THRESHOLD_PX) {
+      const underThreshold = distance < PRESS_THRESHOLD_PX
+
+      const count = (this.pressCounters.get(id) || 0) + (underThreshold ? 1 : -1)
+      const clampedCount = Math.max(0, Math.min(HYSTERESIS_FRAMES, count))
+      this.pressCounters.set(id, clampedCount)
+
+      if (clampedCount === HYSTERESIS_FRAMES && underThreshold) {
+        // Confirmed press
         currentPresses.add(id)
-        this.log?.(`Phalanx ${id} PRESSED!`)
-        // Only trigger press event if not already pressed in last frame
         if (!this.lastPresses.has(id)) {
+          this.log?.(`Phalanx ${id} CONFIRMED PRESS`)
           pressEvents.push({
             hand: phalanx.hand,
             finger: phalanx.finger,
