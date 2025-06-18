@@ -1,7 +1,7 @@
 import { Joint, PressEvent } from '../store/handStore'
 
-// Assuming 0.8m hand-to-camera distance, 1px ≈ 0.5mm
-const PRESS_THRESHOLD_MM = 8
+// Adjusted threshold for more sensitive detection
+const PRESS_THRESHOLD_MM = 12
 const PX_TO_MM = 0.5
 const PRESS_THRESHOLD_PX = PRESS_THRESHOLD_MM / PX_TO_MM
 
@@ -16,10 +16,12 @@ interface Phalanx {
 export class PressDetector {
   private readonly phalanges: Phalanx[]
   private lastPresses: Set<string>
+  private log?: (msg: string) => void
 
-  constructor() {
+  constructor(logFn?: (msg: string) => void) {
     this.phalanges = this.initPhalanges()
     this.lastPresses = new Set()
+    this.log = logFn
   }
 
   private initPhalanges(): Phalanx[] {
@@ -56,10 +58,11 @@ export class PressDetector {
     const currentPresses = new Set<string>()
     const pressEvents: PressEvent[] = []
 
+    this.log?.(`Press threshold: ${PRESS_THRESHOLD_PX} px (${PRESS_THRESHOLD_MM} mm)`)
+
     this.phalanges.forEach((phalanx) => {
       const start = joints[phalanx.startIndex]
       const end = joints[phalanx.endIndex]
-      
       // Calculate midpoint of phalanx
       const midpoint: Joint = {
         x: (start.x + end.x) / 2,
@@ -67,13 +70,12 @@ export class PressDetector {
         z: (start.z + end.z) / 2,
         type: start.type
       }
-
       const distance = this.distance3D(thumbTip, midpoint)
       const id = `${phalanx.hand}-${phalanx.finger}-${phalanx.segment}`
-
+      this.log?.(`Phalanx ${id}: distance=${distance.toFixed(4)} px`)
       if (distance < PRESS_THRESHOLD_PX) {
         currentPresses.add(id)
-        
+        this.log?.(`Phalanx ${id} PRESSED!`)
         // Only trigger press event if not already pressed in last frame
         if (!this.lastPresses.has(id)) {
           pressEvents.push({

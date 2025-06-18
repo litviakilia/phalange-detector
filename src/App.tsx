@@ -12,7 +12,7 @@ const App = () => {
   const videoRef = useRef<HTMLVideoElement>(null)
   const [showPermissionDialog, setShowPermissionDialog] = useState(false)
   const [handTracker, setHandTracker] = useState<HandTracker | null>(null)
-  const [pressDetector] = useState(() => new PressDetector())
+  const [pressDetector] = useState(() => new PressDetector((msg) => setLogs(l => [...l, `[${new Date().toLocaleTimeString()}] ${msg}`])))
   const setJoints = useHandStore(state => state.setJoints)
   const setPresses = useHandStore(state => state.setPresses)
   const [cameraMode, setCameraMode] = useState<'user' | 'environment'>('user')
@@ -144,6 +144,19 @@ const App = () => {
     // eslint-disable-next-line
   }, [])
 
+  // Export log as .txt file
+  const exportLog = () => {
+    const blob = new Blob([logs.join('\n')], { type: 'text/plain' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `phalange-detector-log-${new Date().toISOString().replace(/[:.]/g, '-')}.txt`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+  }
+
   return (
     <div className="camera-container">
       <video
@@ -208,6 +221,19 @@ const App = () => {
           cursor: 'pointer',
         }} onClick={() => setShowLogs(l => !l)}>
           {showLogs ? 'Hide Logs' : 'Show Logs'}
+        </button>
+        <button style={{
+          fontSize: 20,
+          padding: '18px 32px',
+          borderRadius: 12,
+          border: 'none',
+          background: '#888',
+          color: '#fff',
+          fontWeight: 'bold',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
+          cursor: 'pointer',
+        }} onClick={exportLog}>
+          Export Log
         </button>
       </div>
     </div>
