@@ -6,6 +6,7 @@ import { PressDetector } from './lib/pressDetector'
 import { Overlay } from './components/Overlay'
 import { PermissionDialog } from './components/PermissionDialog'
 import { LogWindow } from './components/LogWindow'
+import { StatusBar } from './components/StatusBar'
 
 const App = () => {
   const videoRef = useRef<HTMLVideoElement>(null)
@@ -18,6 +19,7 @@ const App = () => {
   const [stream, setStream] = useState<MediaStream | null>(null)
   const [logs, setLogs] = useState<string[]>([])
   const [showLogs, setShowLogs] = useState(false)
+  const presses = useHandStore(state => state.presses)
 
   useEffect(() => {
     log(`App loaded at URL: ${window.location.href}`)
@@ -154,6 +156,7 @@ const App = () => {
         <PermissionDialog onClose={() => setShowPermissionDialog(false)} />
       )}
       {showLogs && <LogWindow logs={logs} onClose={() => setShowLogs(false)} />}
+      <StatusBar presses={presses} />
       <div style={{
         position: 'fixed',
         left: 0,
