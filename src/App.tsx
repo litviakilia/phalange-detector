@@ -67,6 +67,7 @@ const App = () => {
       if (video.currentTime !== lastVideoTime) {
         frameCount++
         log(`Processing frame #${frameCount} (video time: ${video.currentTime.toFixed(2)}s)`) 
+        log(`Video properties: width=${video.videoWidth}, height=${video.videoHeight}, readyState=${video.readyState}`)
         try {
           const joints = await handTracker.detectHands(video)
           if (joints && joints.length > 0) {
