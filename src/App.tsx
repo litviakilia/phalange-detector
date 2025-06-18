@@ -20,6 +20,8 @@ const App = () => {
   const [showLogs, setShowLogs] = useState(false)
 
   useEffect(() => {
+    log(`App loaded at URL: ${window.location.href}`)
+    log(`User agent: ${navigator.userAgent}`)
     const initHandLandmarker = async () => {
       log('Initializing HandLandmarker...')
       try {
@@ -35,8 +37,17 @@ const App = () => {
         })
         setHandTracker(new HandTracker(landmarker))
         log('HandLandmarker initialized successfully')
-      } catch (e) {
-        log('HandLandmarker error: ' + (e instanceof Error ? e.message : JSON.stringify(e)))
+      } catch (e: any) {
+        if (e instanceof Error) {
+          log('HandLandmarker error: ' + e.message)
+          if (e.stack) log('HandLandmarker error stack: ' + e.stack)
+        } else if (typeof e === 'object') {
+          log('HandLandmarker error (object): ' + JSON.stringify(e))
+          if (e.type) log('Error type: ' + e.type)
+          if (e.target) log('Error target: ' + JSON.stringify(e.target))
+        } else {
+          log('HandLandmarker error (other): ' + String(e))
+        }
       }
     }
     initHandLandmarker()
@@ -54,17 +65,21 @@ const App = () => {
       if (video.currentTime !== lastVideoTime) {
         frameCount++
         log(`Processing frame #${frameCount} (video time: ${video.currentTime.toFixed(2)}s)`) 
-        const joints = await handTracker.detectHands(video)
-        if (joints && joints.length > 0) {
-          setJoints(joints)
-          log(`Detected ${joints.length} joints`)
-          const presses = pressDetector.detectPresses(joints)
-          setPresses(presses)
-          log(`Detected ${presses.length} presses`)
-        } else {
-          setJoints(null)
-          setPresses([])
-          log('No hands detected')
+        try {
+          const joints = await handTracker.detectHands(video)
+          if (joints && joints.length > 0) {
+            setJoints(joints)
+            log(`Detected ${joints.length} joints`)
+            const presses = pressDetector.detectPresses(joints)
+            setPresses(presses)
+            log(`Detected ${presses.length} presses`)
+          } else {
+            setJoints(null)
+            setPresses([])
+            log('No hands detected')
+          }
+        } catch (err) {
+          log('Error during hand detection: ' + (err instanceof Error ? err.message : JSON.stringify(err)))
         }
         lastVideoTime = video.currentTime
       }
